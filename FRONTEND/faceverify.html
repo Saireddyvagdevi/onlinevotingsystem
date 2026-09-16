@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>VoteStream — Face Verification</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+    <style>
+        :root {
+            --navy-950: #0b1d33;
+            --navy-900: #102b4a;
+            --navy-700: #1d4570;
+            --maroon: #8a1538;
+            --saffron: #c9742a;
+            --paper: #f6f3ec;
+            --paper-card: #ffffff;
+            --ink: #1a1a1a;
+            --ink-soft: #5a5a52;
+            --line: #d8d2c2;
+            --ok: #1f6f43;
+            --error: #a32020;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gov-bar {
+            background: var(--navy-950);
+            color: #e8e4d8;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            padding: 7px 0;
+            text-align: center;
+            border-bottom: 3px solid var(--saffron);
+        }
+
+        header {
+            background: var(--navy-900);
+            color: white;
+            padding: 20px 5%;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 12px;
+            color: #a9b8cc;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 20px;
+        }
+
+        .verification-card {
+            width: 100%;
+            max-width: 600px;
+            background: var(--paper-card);
+            border: 1px solid var(--line);
+            border-top: 4px solid var(--maroon);
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(11, 29, 51, 0.10);
+        }
+
+        .verification-card h2 {
+            color: var(--navy-950);
+            margin-bottom: 8px;
+        }
+
+        .verification-card .description {
+            color: var(--ink-soft);
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .camera-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        #video {
+            width: 480px;
+            max-width: 100%;
+            height: auto;
+            border: 3px solid var(--navy-950);
+            border-radius: 10px;
+            background: #111;
+            transform: scaleX(-1);
+        }
+
+        #status {
+            width: 100%;
+            background: #f8f8f8;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        #blinkStatus {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .success {
+            color: var(--ok);
+        }
+
+        .error {
+            color: var(--error);
+        }
+
+        .waiting {
+            color: var(--ink-soft);
+        }
+
+        #verifyBtn {
+            width: 100%;
+            max-width: 300px;
+            padding: 13px 20px;
+            margin-top: 8px;
+            background: var(--navy-950);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #verifyBtn:hover:not(:disabled) {
+            background: var(--navy-700);
+        }
+
+        #verifyBtn:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 11px;
+            color: var(--ink-soft);
+            padding: 20px;
+        }
+
+        @media (max-width: 500px) {
+            .verification-card {
+                padding: 22px 16px;
+            }
+
+            #video {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="gov-bar">
+        SECURE ELECTORAL PORTAL · SESSION ENCRYPTED · BUILD 2026.06
+    </div>
+
+    <header>
+        <h1>VoteStream</h1>
+        <p>National Digital Voting Authority</p>
+    </header>
+
+    <main>
+
+        <div class="verification-card">
+
+            <h2>Face Verification</h2>
+
+            <p class="description">
+                Look directly at the camera and blink once naturally.
+                Your face will be verified before you can access the ballot.
+            </p>
+
+            <div class="camera-container">
+                <video id="video" autoplay muted playsinline></video>
+            </div>
+
+            <div id="status" class="waiting">
+                Starting verification...
+            </div>
+
+            <div id="blinkStatus" class="waiting">
+                Blink: Waiting...
+            </div>
+
+            <button id="verifyBtn" disabled>
+                Verify Face
+            </button>
+
+        </div>
+
+    </main>
+
+    <footer>
+        VOTESTREAM · A SECURE NATIONAL ELECTORAL SYSTEM · NOT AFFILIATED WITH ANY GOVERNMENT BODY
+    </footer>
+
+
+<script>
+
+    // =========================================================
+    // ELEMENTS
+    // =========================================================
+
+    const video = document.getElementById("video");
+    const statusText = document.getElementById("status");
+    const blinkStatus = document.getElementById("blinkStatus");
+    const verifyBtn = document.getElementById("verifyBtn");
+
+
+    // =========================================================
+    // EXISTING PROJECT MODEL LOCATION
+    // DO NOT CHANGE YOUR FOLDER STRUCTURE
+    // =========================================================
+
+    const MODEL_URL = "./models";
+
+
+    // =========================================================
+    // IMPORTANT:
+    // login.html stores:
+    //
+    // localStorage.setItem("user_id", data.user.id);
+    //
+    // Therefore we MUST use "user_id"
+    // =========================================================
+
+    const userId = localStorage.getItem("user_id");
+
+
+    // =========================================================
+    // CONTROL VARIABLES
+    // =========================================================
+
+    let blinkDetected = false;
+
+    let eyesOpened = false;
+    let eyesClosed = false;
+
+    let detectionRunning = false;
+    let cameraStarted = false;
+    let verificationInProgress = false;
+
+    let detectionTimer = null;
+
+
+    // =========================================================
+    // BLINK THRESHOLDS
+    // =========================================================
+
+    /*
+       EAR = Eye Aspect Ratio
+
+       Normal open eye:
+       approximately 0.30 - 0.40+
+
+       Closed eye:
+       approximately 0.20 - 0.27
+
+       We use two thresholds to make the detection
+       more stable.
+    */
+
+    const EYE_CLOSED_THRESHOLD = 0.27;
+    const EYE_OPEN_THRESHOLD = 0.30;
+
+
+    // =========================================================
+    // DISTANCE BETWEEN TWO LANDMARK POINTS
+    // =========================================================
+
+    function pointDistance(p1, p2) {
+
+        return Math.sqrt(
+            Math.pow(p1.x - p2.x, 2) +
+            Math.pow(p1.y - p2.y, 2)
+        );
+    }
+
+
+    // =========================================================
+    // CALCULATE EAR
+    // =========================================================
+
+    function calculateEAR(eye) {
+
+        if (!eye || eye.length < 6) {
+            return 1;
+        }
+
+        const vertical1 =
+            pointDistance(eye[1], eye[5]);
+
+        const vertical2 =
+            pointDistance(eye[2], eye[4]);
+
+        const horizontal =
+            pointDistance(eye[0], eye[3]);
+
+        if (horizontal === 0) {
+            return 1;
+        }
+
+        return (
+            (vertical1 + vertical2) /
+            (2 * horizontal)
+        );
+    }
+
+
+    // =========================================================
+    // LOAD EXISTING FACE-API MODELS
+    // =========================================================
+
+    async function loadModels() {
+
+        try {
+
+            statusText.innerText =
+                "Loading face verification models...";
+
+            /*
+                ONLY EXISTING MODELS ARE USED:
+
+                1. SSD MobileNet V1
+                2. Face Landmark 68
+                3. Face Recognition
+
+                NO TinyFaceDetector.
+            */
+
+            await Promise.all([
+
+                faceapi.nets.ssdMobilenetv1.loadFromUri(
+                    MODEL_URL
+                ),
+
+                faceapi.nets.faceLandmark68Net.loadFromUri(
+                    MODEL_URL
+                ),
+
+                faceapi.nets.faceRecognitionNet.loadFromUri(
+                    MODEL_URL
+                )
+
+            ]);
+
+            statusText.innerText =
+                "Models loaded. Starting camera...";
+
+            await startCamera();
+
+        } catch (error) {
+
+            console.error(
+                "Model loading error:",
+                error
+            );
+
+            statusText.innerText =
+                "Unable to load face verification models.";
+
+            statusText.className = "error";
+        }
+    }
+
+
+    // =========================================================
+    // START CAMERA
+    // =========================================================
+
+    async function startCamera() {
+
+        try {
+
+            const stream =
+                await navigator.mediaDevices.getUserMedia({
+
+                    video: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "user"
+                    },
+
+                    audio: false
+
+                });
+
+
+            video.srcObject = stream;
+
+            cameraStarted = true;
+
+
+            video.onloadedmetadata = () => {
+
+                video.play();
+
+                statusText.innerText =
+                    "Look at the camera. Keep your eyes open first.";
+
+                blinkStatus.innerText =
+                    "Blink: Detecting face...";
+
+                blinkStatus.className =
+                    "waiting";
+
+                startFaceDetection();
+
+            };
+
+
+        } catch (error) {
+
+            console.error(
+                "Camera error:",
+                error
+            );
+
+            statusText.innerText =
+                "Camera access denied or unavailable.";
+
+            statusText.className =
+                "error";
+        }
+    }
+
+
+    // =========================================================
+    // FACE DETECTION LOOP
+    // =========================================================
+
+    /*
+       VERY IMPORTANT:
+
+       We DO NOT use:
+
+       setInterval(async () => {
+           detect...
+       }, 300);
+
+       because SSD detections can overlap.
+
+       Instead:
+
+       Detection
+          ↓
+       Wait until complete
+          ↓
+       Process blink
+          ↓
+       Small delay
+          ↓
+       Next detection
+    */
+
+    async function startFaceDetection() {
+
+        if (!cameraStarted) {
+            return;
+        }
+
+        if (verificationInProgress) {
+            return;
+        }
+
+        if (blinkDetected) {
+            return;
+        }
+
+        if (detectionRunning) {
+            return;
+        }
+
+        detectionRunning = true;
+
+
+        try {
+
+            const detection =
+                await faceapi
+                    .detectSingleFace(
+                        video,
+                        new faceapi.SsdMobilenetv1Options({
+                            minConfidence: 0.40
+                        })
+                    )
+                    .withFaceLandmarks();
+
+
+            if (detection) {
+
+                processBlink(detection);
+
+            } else {
+
+                blinkStatus.innerText =
+                    "Blink: Face not detected";
+
+                blinkStatus.className =
+                    "waiting";
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "Face detection error:",
+                error
+            );
+
+        } finally {
+
+            detectionRunning = false;
+
+        }
+
+
+        /*
+           Continue detection only if blink has not
+           already been completed.
+        */
+
+        if (!blinkDetected &&
+            cameraStarted &&
+            !verificationInProgress) {
+
+            detectionTimer = setTimeout(
+                startFaceDetection,
+                100
+            );
+        }
+    }
+
+
+    // =========================================================
+    // BLINK PROCESSING
+    // =========================================================
+
+    function processBlink(detection) {
+
+        const landmarks =
+            detection.landmarks;
+
+
+        const leftEye =
+            landmarks.getLeftEye();
+
+        const rightEye =
+            landmarks.getRightEye();
+
+
+        const leftEAR =
+            calculateEAR(leftEye);
+
+        const rightEAR =
+            calculateEAR(rightEye);
+
+
+        const averageEAR =
+            (leftEAR + rightEAR) / 2;
+
+
+        console.log(
+            "Left EAR:",
+            leftEAR.toFixed(3),
+            "Right EAR:",
+            rightEAR.toFixed(3),
+            "Average:",
+            averageEAR.toFixed(3)
+        );
+
+
+        // =====================================================
+        // STEP 1:
+        // MAKE SURE USER'S EYES ARE OPEN
+        // =====================================================
+
+        if (!eyesOpened) {
+
+            if (
+                averageEAR >
+                EYE_OPEN_THRESHOLD
+            ) {
+
+                eyesOpened = true;
+
+                blinkStatus.innerText =
+                    "Blink: Eyes open ✓";
+
+                blinkStatus.className =
+                    "waiting";
+
+                statusText.innerText =
+                    "Eyes detected. Blink once.";
+
+            }
+
+            return;
+        }
+
+
+        // =====================================================
+        // STEP 2:
+        // EYES CLOSED
+        // =====================================================
+
+        if (
+            eyesOpened &&
+            !eyesClosed &&
+            averageEAR <
+            EYE_CLOSED_THRESHOLD
+        ) {
+
+            eyesClosed = true;
+
+            blinkStatus.innerText =
+                "Blink: Eyes closed ✓";
+
+            blinkStatus.className =
+                "waiting";
+
+            statusText.innerText =
+                "Good. Open your eyes.";
+
+            return;
+        }
+
+
+        // =====================================================
+        // STEP 3:
+        // EYES OPEN AGAIN
+        //
+        // OPEN → CLOSED → OPEN
+        // = REAL BLINK
+        // =====================================================
+
+        if (
+            eyesOpened &&
+            eyesClosed &&
+            averageEAR >
+            EYE_OPEN_THRESHOLD
+        ) {
+
+            blinkDetected = true;
+
+            blinkStatus.innerText =
+                "Blink: Verified ✓";
+
+            blinkStatus.className =
+                "success";
+
+            statusText.innerText =
+                "Blink verified. Now verify your face.";
+
+            statusText.className =
+                "success";
+
+
+            verifyBtn.disabled = false;
+
+
+            /*
+               Stop continuous blink detection.
+               Face verification happens when the user
+               clicks Verify Face.
+            */
+
+            if (detectionTimer) {
+
+                clearTimeout(
+                    detectionTimer
+                );
+
+                detectionTimer = null;
+            }
+        }
+    }
+
+
+    // =========================================================
+    // VERIFY FACE
+    // =========================================================
+
+    verifyBtn.addEventListener(
+        "click",
+        async () => {
+
+            if (!blinkDetected) {
+
+                statusText.innerText =
+                    "Please blink once before verification.";
+
+                return;
+            }
+
+
+            if (verificationInProgress) {
+                return;
+            }
+
+
+            verificationInProgress = true;
+
+            verifyBtn.disabled = true;
+
+            statusText.innerText =
+                "Verifying your registered face...";
+
+            statusText.className =
+                "waiting";
+
+
+            try {
+
+                /*
+                   Final face detection.
+
+                   SSD + Landmark + Recognition
+                   are used exactly as in the existing project.
+                */
+
+                const detection =
+                    await faceapi
+                        .detectSingleFace(
+                            video,
+                            new faceapi.SsdMobilenetv1Options({
+                                minConfidence: 0.40
+                            })
+                        )
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+
+
+                if (!detection) {
+
+                    statusText.innerText =
+                        "Face not detected. Please try again.";
+
+                    statusText.className =
+                        "error";
+
+                    verificationInProgress =
+                        false;
+
+                    verifyBtn.disabled =
+                        false;
+
+                    return;
+                }
+
+
+                // =================================================
+                // FACE DESCRIPTOR
+                // =================================================
+
+                const faceDescriptor =
+                    Array.from(
+                        detection.descriptor
+                    );
+
+
+                console.log(
+                    "Face descriptor length:",
+                    faceDescriptor.length
+                );
+
+
+                // =================================================
+                // SEND TO EXISTING BACKEND
+                // =================================================
+
+                const response =
+                    await fetch(
+                        "http://localhost:5000/verify-face",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                userId: userId,
+
+                                face_descriptor:
+                                    faceDescriptor
+
+                            })
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(
+                    "Verification response:",
+                    result
+                );
+
+
+                // =================================================
+                // WRONG FACE
+                // =================================================
+
+                if (response.status === 401) {
+
+                    statusText.innerText =
+                        "Face does not match the registered voter.";
+
+                    statusText.className =
+                        "error";
+
+                    stopCamera();
+
+                    verificationInProgress =
+                        false;
+
+                    return;
+                }
+
+
+                // =================================================
+                // ALREADY VOTED
+                // =================================================
+
+                if (response.status === 409) {
+
+                    statusText.innerText =
+                        "Face verified, but you have already voted.";
+
+                    statusText.className =
+                        "error";
+
+                    stopCamera();
+
+                    verificationInProgress =
+                        false;
+
+                    return;
+                }
+
+
+                // =================================================
+                // SUCCESS
+                // =================================================
+
+                if (
+                    response.ok &&
+                    result.success === true
+                ) {
+
+                    statusText.innerText =
+                        "Face verified successfully.";
+
+                    statusText.className =
+                        "success";
+
+
+                    stopCamera();
+
+
+                    setTimeout(
+                        () => {
+
+                            window.location.href =
+                                "vote.html";
+
+                        },
+                        700
+                    );
+
+                    return;
+                }
+
+
+                // =================================================
+                // OTHER SERVER ERROR
+                // =================================================
+
+                statusText.innerText =
+                    result.message ||
+                    "Face verification failed.";
+
+                statusText.className =
+                    "error";
+
+
+                verificationInProgress =
+                    false;
+
+                verifyBtn.disabled =
+                    false;
+
+
+            } catch (error) {
+
+                console.error(
+                    "Verification error:",
+                    error
+                );
+
+
+                statusText.innerText =
+                    "Unable to connect to the voting server.";
+
+                statusText.className =
+                    "error";
+
+
+                verificationInProgress =
+                    false;
+
+                verifyBtn.disabled =
+                    false;
+            }
+
+        }
+    );
+
+
+    // =========================================================
+    // STOP CAMERA
+    // =========================================================
+
+    function stopCamera() {
+
+        if (detectionTimer) {
+
+            clearTimeout(
+                detectionTimer
+            );
+
+            detectionTimer = null;
+        }
+
+
+        if (video.srcObject) {
+
+            video.srcObject
+                .getTracks()
+                .forEach(
+                    track => track.stop()
+                );
+
+            video.srcObject = null;
+        }
+
+
+        cameraStarted = false;
+    }
+
+
+    // =========================================================
+    // CLEAN UP WHEN PAGE CLOSES
+    // =========================================================
+
+    window.addEventListener(
+        "beforeunload",
+        () => {
+
+            stopCamera();
+
+        }
+    );
+
+
+    // =========================================================
+    // START
+    // =========================================================
+
+    /*
+       IMPORTANT:
+
+       If login.html successfully logged in,
+       user_id will exist.
+
+       Then models load and camera starts.
+    */
+
+    if (!userId) {
+
+        statusText.innerText =
+            "User ID not found. Please login again.";
+
+        statusText.className =
+            "error";
+
+        blinkStatus.innerText =
+            "Blink: Waiting...";
+
+    } else {
+
+        loadModels();
+
+    }
+
+</script>
+
+</body>
+</html>
+

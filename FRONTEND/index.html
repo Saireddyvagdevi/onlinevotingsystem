@@ -1,0 +1,2306 @@
+<!DOCTYPE html>
+<!-- OTP verification enabled -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteStream — Voter Registration</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+
+<style>
+:root{
+  --navy-950: #0b1d33;
+  --navy-900: #102b4a;
+  --navy-700: #1d4570;
+  --maroon: #8a1538;
+  --saffron: #c9742a;
+  --paper: #f6f3ec;
+  --paper-card: #ffffff;
+  --ink: #1a1a1a;
+  --ink-soft: #5a5a52;
+  --line: #d8d2c2;
+  --ok: #1f6f43;
+  --ok-bg: #eaf3ec;
+  --err: #9c2b2b;
+  --err-bg: #fbeeee;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body{
+  font-family:'Inter', sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+}
+
+.gov-bar{
+  background:var(--navy-950);
+  color:#e8e4d8;
+  font-family:'JetBrains Mono', monospace;
+  font-size:11px;
+  letter-spacing:0.08em;
+  padding:7px 0;
+  text-align:center;
+  border-bottom:3px solid var(--saffron);
+}
+
+header.site-header{
+  background:var(--navy-900);
+  color:#fff;
+  padding:22px 5%;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.emblem{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:2px solid var(--saffron);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.emblem svg{
+  width:26px;
+  height:26px;
+}
+
+.brand-text h1{
+  font-family:'Source Serif 4', serif;
+  font-weight:600;
+  font-size:22px;
+}
+
+.brand-text p{
+  font-size:11.5px;
+  color:#a9b8cc;
+  letter-spacing:0.04em;
+  margin-top:2px;
+}
+
+main{
+  display:flex;
+  justify-content:center;
+  padding:48px 20px 70px;
+}
+
+.reg-shell{
+  width:100%;
+  max-width:520px;
+}
+
+.shell-eyebrow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.shell-eyebrow .rule{
+  flex:1;
+  height:1px;
+  background:var(--line);
+}
+
+.shell-eyebrow span{
+  font-family:'JetBrains Mono', monospace;
+  font-size:10.5px;
+  letter-spacing:0.12em;
+  color:var(--ink-soft);
+  text-transform:uppercase;
+}
+
+.card{
+  background:var(--paper-card);
+  border:1px solid var(--line);
+  border-top:4px solid var(--maroon);
+  padding:38px 36px 32px;
+  box-shadow:0 1px 2px rgba(11,29,51,0.04),
+             0 12px 28px -16px rgba(11,29,51,0.18);
+}
+
+.card h2{
+  font-family:'Source Serif 4', serif;
+  font-size:27px;
+  font-weight:600;
+  margin-bottom:6px;
+  color:var(--navy-950);
+}
+
+.card .sub{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  margin-bottom:28px;
+  line-height:1.5;
+}
+
+.section-label{
+  font-family:'JetBrains Mono', monospace;
+  font-size:10.5px;
+  letter-spacing:0.1em;
+  color:var(--navy-700);
+  text-transform:uppercase;
+  margin:26px 0 14px;
+  padding-bottom:8px;
+  border-bottom:1px solid var(--line);
+}
+
+.section-label:first-of-type{
+  margin-top:0;
+}
+
+.field{
+  margin-bottom:18px;
+}
+
+.field label{
+  display:block;
+  font-size:12.5px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  margin-bottom:7px;
+  color:var(--navy-950);
+}
+
+.field input{
+  width:100%;
+  padding:12px 14px;
+  border:1.5px solid var(--line);
+  background:#fcfbf8;
+  font-size:14.5px;
+  font-family:'Inter', sans-serif;
+  color:var(--ink);
+  outline:none;
+  transition:border-color 0.15s ease, background 0.15s ease;
+}
+
+.field input:focus{
+  border-color:var(--navy-700);
+  background:#fff;
+}
+
+.field input::placeholder{
+  color:#b3ad9c;
+}
+
+.field input.valid{
+  border-color:var(--ok);
+  background:var(--ok-bg);
+}
+
+.field input.invalid{
+  border-color:var(--err);
+  background:var(--err-bg);
+}
+
+.hint{
+  font-size:11.5px;
+  margin-top:6px;
+  min-height:15px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.hint.ok{
+  color:var(--ok);
+}
+
+.hint.err{
+  color:var(--err);
+}
+
+.hint.info{
+  color:var(--ink-soft);
+}
+
+.mobile-row{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.mobile-row .field{
+  flex:1;
+  margin-bottom:0;
+}
+
+#btnSendOtp{
+  white-space:nowrap;
+  padding:12px 16px;
+  background:var(--navy-950);
+  color:#fff;
+  border:none;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  cursor:pointer;
+  transition:background 0.15s ease;
+  margin-top:25px;
+}
+
+#btnSendOtp:hover:not(:disabled){
+  background:var(--navy-700);
+}
+
+#btnSendOtp:disabled{
+  background:#a8a39660;
+  cursor:not-allowed;
+}
+
+#btnSendOtp.verified{
+  background:var(--ok);
+}
+
+.otp-verify-box{
+  display:none;
+  margin-top:14px;
+  background:#f0f5fa;
+  border:1px solid #b9cce0;
+  padding:16px;
+}
+
+.otp-verify-box.visible{
+  display:block;
+}
+
+.otp-verify-box label{
+  color:var(--navy-700);
+  font-weight:600;
+  font-size:12.5px;
+}
+
+.otp-digits{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.otp-digits input{
+  width:42px !important;
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+  padding:9px 0 !important;
+  letter-spacing:1px;
+}
+
+.otp-digits input.invalid{
+  border-color:var(--err);
+  background:var(--err-bg);
+}
+
+.verified-badge{
+  display:none;
+  margin-top:14px;
+  background:var(--ok-bg);
+  border:1px solid #a8d3b4;
+  padding:10px 14px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--ok);
+}
+
+.verified-badge.visible{
+  display:block;
+}
+
+.countdown{
+  font-size:11.5px;
+  color:var(--ink-soft);
+  margin-top:8px;
+}
+
+.countdown a{
+  color:var(--navy-700);
+  cursor:pointer;
+  font-weight:600;
+}
+
+video{
+  width:100%;
+  border:1.5px solid var(--line);
+  margin-top:6px;
+  display:block;
+}
+
+button.primary-btn{
+  width:100%;
+  padding:13px;
+  margin-top:8px;
+  background:var(--navy-950);
+  color:#fff;
+  border:none;
+  font-size:14.5px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  cursor:pointer;
+  transition:background 0.15s ease;
+}
+
+button.primary-btn:hover:not(:disabled){
+  background:var(--navy-700);
+}
+
+button.primary-btn:disabled{
+  background:#a8a39660;
+  cursor:not-allowed;
+}
+
+#statusMsg{
+  text-align:center;
+  margin-top:14px;
+  font-size:13.5px;
+  color:var(--ink-soft);
+  min-height:18px;
+  font-weight:500;
+}
+
+#faceStatus{
+  text-align:center;
+  margin-top:8px;
+  font-weight:600;
+  font-size:13.5px;
+}
+
+#blinkBox{
+  text-align:center;
+  margin-top:10px;
+  padding:11px;
+  background:#f0f4ff;
+  font-size:13.5px;
+  border:1px solid #c8d4f0;
+}
+
+.blink-ok{
+  background:var(--ok-bg) !important;
+  color:var(--ok);
+  border-color:#a8d3b4 !important;
+}
+
+p.foot-link{
+  text-align:center;
+  margin-top:22px;
+  font-size:13.5px;
+  color:var(--ink-soft);
+}
+
+a{
+  text-decoration:none;
+  color:var(--maroon);
+  font-weight:600;
+  border-bottom:1px solid transparent;
+  transition:border-color 0.15s ease;
+}
+
+a:hover{
+  border-bottom-color:var(--maroon);
+}
+
+.toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--navy-950);
+  color:#fff;
+  padding:13px 22px;
+  font-size:13px;
+  font-weight:500;
+  box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  transition:transform 0.3s ease;
+  z-index:999;
+  max-width:340px;
+  text-align:center;
+}
+
+.toast.show{
+  transform:translateX(-50%) translateY(0);
+}
+
+.toast.success{
+  background:var(--ok);
+}
+
+.toast.error{
+  background:var(--err);
+}
+
+footer{
+  text-align:center;
+  font-size:11px;
+  color:var(--ink-soft);
+  padding:20px;
+  font-family:'JetBrains Mono', monospace;
+  letter-spacing:0.03em;
+}
+
+@media (max-width:560px){
+  .card{
+    padding:30px 22px 26px;
+  }
+
+  .mobile-row{
+    flex-direction:column;
+  }
+
+  #btnSendOtp{
+    margin-top:0;
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="gov-bar">
+  SECURE ELECTORAL PORTAL · SESSION ENCRYPTED · BUILD 2026.06
+</div>
+
+<header class="site-header">
+  <div class="emblem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c9742a" stroke-width="1.4">
+      <circle cx="12" cy="12" r="9.4"/>
+      <circle cx="12" cy="12" r="1.6" fill="#c9742a" stroke="none"/>
+      <g stroke="#c9742a" stroke-width="0.9">
+        <line x1="12" y1="2.6" x2="12" y2="6"/>
+        <line x1="12" y1="18" x2="12" y2="21.4"/>
+        <line x1="2.6" y1="12" x2="6" y2="12"/>
+        <line x1="18" y1="12" x2="21.4" y2="12"/>
+        <line x1="5.2" y1="5.2" x2="7.5" y2="7.5"/>
+        <line x1="16.5" y1="16.5" x2="18.8" y2="18.8"/>
+        <line x1="18.8" y1="5.2" x2="16.5" y2="7.5"/>
+        <line x1="7.5" y1="16.5" x2="5.2" y2="18.8"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="brand-text">
+    <h1>VoteStream</h1>
+    <p>National Digital Voting Authority</p>
+  </div>
+</header>
+
+<main>
+  <div class="reg-shell">
+
+    <div class="shell-eyebrow">
+      <span>New Voter Registration</span>
+      <div class="rule"></div>
+    </div>
+
+    <div class="card">
+
+      <h2>Create your voter profile</h2>
+
+      <p class="sub">
+        All fields are required for identity verification.
+        Your face will be captured for biometric confirmation at voting time.
+      </p>
+
+      <form id="registerForm" novalidate>
+
+        <!-- PERSONAL DETAILS -->
+        <div class="section-label">Personal details</div>
+
+        <div class="field">
+          <label>Full name</label>
+          <input
+            type="text"
+            id="name"
+            placeholder="As per official records"
+            required
+          >
+          <div class="hint info" id="hint-name">
+            Letters only, minimum 3 characters
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Email address</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="you@example.com"
+            required
+          >
+          <div class="hint info" id="hint-email">
+            Enter a valid email address
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Min 8 characters"
+            required
+          >
+          <div class="hint info" id="hint-password">
+            At least 8 characters, 1 number, 1 symbol
+          </div>
+        </div>
+
+        <!-- IDENTITY -->
+        <div class="section-label">Identity verification</div>
+
+        <div class="field">
+          <label>Aadhaar number</label>
+          <input
+            type="text"
+            id="aadhaar"
+            maxlength="14"
+            placeholder="XXXX XXXX XXXX"
+            inputmode="numeric"
+            required
+          >
+          <div class="hint info" id="hint-aadhaar">
+            12-digit Aadhaar number
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Date of birth</label>
+          <input
+            type="date"
+            id="dob"
+            required
+          >
+          <div class="hint info" id="hint-dob">
+            Must be 18 or older to vote
+          </div>
+        </div>
+
+        <!-- MOBILE -->
+        <div class="field">
+          <label>Mobile number</label>
+
+          <div class="mobile-row">
+
+            <div class="field">
+              <input
+                type="tel"
+                id="mobile"
+                maxlength="10"
+                placeholder="10-digit mobile number"
+                inputmode="numeric"
+                required
+              >
+
+              <div class="hint info" id="hint-mobile">
+                Indian number starting with 6, 7, 8, or 9
+              </div>
+            </div>
+
+            <button
+              type="button"
+              id="btnSendOtp"
+              disabled
+            >
+              Send OTP
+            </button>
+
+          </div>
+
+          <div class="otp-verify-box" id="otpBox">
+
+            <label>
+              Enter 6-digit OTP sent to your mobile
+            </label>
+
+            <div class="otp-digits">
+
+              <input type="text" maxlength="1" inputmode="numeric"
+                     class="otp-digit" id="otp0">
+
+              <input type="text" maxlength="1" inputmode="numeric"
+                     class="otp-digit" id="otp1">
+
+              <input type="text" maxlength="1" inputmode="numeric"
+                     class="otp-digit" id="otp2">
+
+              <input type="text" maxlength="1" inputmode="numeric"
+                     class="otp-digit" id="otp3">
+
+              <input type="text" maxlength="1" inputmode="numeric"
+                     class="otp-digit" id="otp4">
+
+              <input type="text" maxlength="1" inputmode="numeric"
+                     class="otp-digit" id="otp5">
+
+            </div>
+
+            <div class="countdown" id="countdown"></div>
+
+          </div>
+
+          <div class="verified-badge" id="verifiedBadge">
+            ✓ Mobile number verified
+          </div>
+
+        </div>
+
+        <!-- BIOMETRIC -->
+        <div class="section-label">
+          Biometric capture
+        </div>
+
+        <p id="statusMsg">
+          Loading face detection models…
+        </p>
+
+        <video
+          id="video"
+          autoplay
+          playsinline
+          muted
+        ></video>
+
+        <canvas
+          id="canvas"
+          style="display:none;"
+        ></canvas>
+
+        <div id="blinkBox">
+          Blink your eyes to verify you are a real person
+        </div>
+
+        <button
+          type="button"
+          id="captureBtn"
+          class="primary-btn"
+          onclick="captureFace()"
+          disabled
+          style="margin-top:10px;"
+        >
+          Capture face
+        </button>
+
+        <p id="faceStatus"></p>
+
+        <button
+          type="submit"
+          id="registerBtn"
+          class="primary-btn"
+          disabled
+          style="margin-top:24px;"
+        >
+          Submit registration
+        </button>
+
+      </form>
+
+      <p class="foot-link">
+        Already registered?
+        <a href="login.html">Sign in</a>
+      </p>
+
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  VOTESTREAM · A SECURE NATIONAL ELECTORAL SYSTEM ·
+  NOT AFFILIATED WITH ANY GOVERNMENT BODY
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+
+<script>
+
+const BACKEND = API_BASE_URL;
+const API_URL = API_BASE_URL;
+const MODEL_URL = "./models";
+
+/* =========================================================
+   GENERAL UI FUNCTIONS
+========================================================= */
+
+function showToast(msg, type = 'success') {
+
+  const t = document.getElementById('toast');
+
+  t.textContent = msg;
+
+  t.className = `toast ${type} show`;
+
+  setTimeout(() => {
+    t.classList.remove('show');
+  }, 3500);
+}
+
+function setHint(hintId, inputId, state, msg) {
+
+  const hint = document.getElementById(hintId);
+  const inp = document.getElementById(inputId);
+
+  if (inp) {
+    inp.classList.remove('valid', 'invalid');
+  }
+
+  hint.className = 'hint ' + (state || 'info');
+  hint.textContent = msg;
+
+  if (inp && state === 'ok') {
+    inp.classList.add('valid');
+  }
+
+  if (inp && state === 'err') {
+    inp.classList.add('invalid');
+  }
+}
+
+
+/* =========================================================
+   NAME VALIDATION
+========================================================= */
+
+document.getElementById('name').addEventListener('input', function() {
+
+  const v = this.value.trim();
+
+  if (!v) {
+    return setHint(
+      'hint-name',
+      'name',
+      'info',
+      'Letters only, minimum 3 characters'
+    );
+  }
+
+  if (v.length < 3) {
+    return setHint(
+      'hint-name',
+      'name',
+      'err',
+      'Name too short (minimum 3 characters)'
+    );
+  }
+
+  if (!/^[a-zA-Z\s.'\-]+$/.test(v)) {
+
+    return setHint(
+      'hint-name',
+      'name',
+      'err',
+      "Only letters, spaces, . ' - allowed"
+    );
+  }
+
+  setHint(
+    'hint-name',
+    'name',
+    'ok',
+    'Valid name'
+  );
+
+  updateRegisterBtn();
+});
+
+
+/* =========================================================
+   EMAIL VALIDATION
+========================================================= */
+
+document.getElementById('email').addEventListener('input', function() {
+
+  const v = this.value.trim();
+
+  if (!v) {
+
+    return setHint(
+      'hint-email',
+      'email',
+      'info',
+      'Enter a valid email address'
+    );
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+
+    return setHint(
+      'hint-email',
+      'email',
+      'err',
+      'Invalid email format'
+    );
+  }
+
+  setHint(
+    'hint-email',
+    'email',
+    'ok',
+    'Valid email'
+  );
+
+  updateRegisterBtn();
+});
+
+
+/* =========================================================
+   PASSWORD VALIDATION
+========================================================= */
+
+document.getElementById('password').addEventListener('input', function() {
+
+  const v = this.value;
+
+  if (!v) {
+
+    return setHint(
+      'hint-password',
+      'password',
+      'info',
+      'At least 8 characters, 1 number, 1 symbol'
+    );
+  }
+
+  if (v.length < 8) {
+
+    return setHint(
+      'hint-password',
+      'password',
+      'err',
+      'Too short — need at least 8 characters'
+    );
+  }
+
+  if (!/\d/.test(v)) {
+
+    return setHint(
+      'hint-password',
+      'password',
+      'err',
+      'Add at least one number'
+    );
+  }
+
+  if (!/[^a-zA-Z0-9]/.test(v)) {
+
+    return setHint(
+      'hint-password',
+      'password',
+      'err',
+      'Add at least one special character'
+    );
+  }
+
+  setHint(
+    'hint-password',
+    'password',
+    'ok',
+    'Strong password'
+  );
+
+  updateRegisterBtn();
+});
+
+
+/* =========================================================
+   AADHAAR VALIDATION
+========================================================= */
+
+document.getElementById('aadhaar').addEventListener('input', function() {
+
+  let digits = this.value
+    .replace(/\D/g, '')
+    .slice(0, 12);
+
+  this.value = digits
+    .replace(/(\d{4})(?=\d)/g, '$1 ')
+    .trim();
+
+  validateAadhaar(digits);
+});
+
+
+function verhoeff(num) {
+
+  const d = [
+    [0,1,2,3,4,5,6,7,8,9],
+    [1,2,3,4,0,6,7,8,9,5],
+    [2,3,4,0,1,7,8,9,5,6],
+    [3,4,0,1,2,8,9,5,6,7],
+    [4,0,1,2,3,9,5,6,7,8],
+    [5,9,8,7,6,0,4,3,2,1],
+    [6,5,9,8,7,1,0,4,3,2],
+    [7,6,5,9,8,2,1,0,4,3],
+    [8,7,6,5,9,3,2,1,0,4],
+    [9,8,7,6,5,4,3,2,1,0]
+  ];
+
+  const p = [
+    [0,1,2,3,4,5,6,7,8,9],
+    [1,5,7,6,2,8,3,0,9,4],
+    [5,8,0,3,7,9,6,1,4,2],
+    [8,9,1,6,0,4,3,5,2,7],
+    [9,4,5,3,1,2,6,8,7,0],
+    [4,2,8,6,5,7,3,9,0,1],
+    [2,7,9,3,8,0,6,4,1,5],
+    [7,0,4,6,9,1,3,2,5,8]
+  ];
+
+  let c = 0;
+
+  const rev = num.split('').reverse();
+
+  for (let i = 0; i < rev.length; i++) {
+
+    c = d[c][
+      p[i % 8][parseInt(rev[i])]
+    ];
+  }
+
+  return c === 0;
+}
+
+
+function validateAadhaar(digits) {
+
+  if (!digits) {
+
+    return setHint(
+      'hint-aadhaar',
+      'aadhaar',
+      'info',
+      '12-digit Aadhaar number'
+    );
+  }
+
+  if (digits.length < 12) {
+
+    return setHint(
+      'hint-aadhaar',
+      'aadhaar',
+      'err',
+      `${12 - digits.length} more digit(s) needed`
+    );
+  }
+
+  if (['0', '1'].includes(digits[0])) {
+
+    return setHint(
+      'hint-aadhaar',
+      'aadhaar',
+      'err',
+      'Invalid Aadhaar — cannot start with 0 or 1'
+    );
+  }
+
+  if (verhoeff(digits)) {
+
+    setHint(
+      'hint-aadhaar',
+      'aadhaar',
+      'ok',
+      'Valid Aadhaar number'
+    );
+
+  } else {
+
+    setHint(
+      'hint-aadhaar',
+      'aadhaar',
+      'err',
+      'Invalid Aadhaar number — please recheck'
+    );
+  }
+
+  updateRegisterBtn();
+}
+
+
+/* =========================================================
+   DATE OF BIRTH
+========================================================= */
+
+const maxDob = new Date();
+
+maxDob.setFullYear(
+  maxDob.getFullYear() - 18
+);
+
+document.getElementById('dob').max =
+  maxDob.toISOString().split('T')[0];
+
+
+document.getElementById('dob').addEventListener('change', function() {
+
+  if (!this.value) {
+
+    return setHint(
+      'hint-dob',
+      'dob',
+      'info',
+      'Must be 18 or older to vote'
+    );
+  }
+
+  const birth = new Date(this.value);
+  const today = new Date();
+
+  let age =
+    today.getFullYear() -
+    birth.getFullYear();
+
+  const m =
+    today.getMonth() -
+    birth.getMonth();
+
+  if (
+    m < 0 ||
+    (m === 0 && today.getDate() < birth.getDate())
+  ) {
+    age--;
+  }
+
+  if (age >= 18) {
+
+    setHint(
+      'hint-dob',
+      'dob',
+      'ok',
+      `Age ${age} — eligible to vote`
+    );
+
+  } else {
+
+    setHint(
+      'hint-dob',
+      'dob',
+      'err',
+      'You must be at least 18 years old'
+    );
+  }
+
+  updateRegisterBtn();
+});
+
+
+/* =========================================================
+   MOBILE + OTP
+========================================================= */
+
+let mobileVerified = false;
+let timerInterval = null;
+
+
+document.getElementById('mobile').addEventListener('input', function() {
+
+  if (mobileVerified) {
+
+    mobileVerified = false;
+
+    document
+      .getElementById('verifiedBadge')
+      .classList.remove('visible');
+
+    document
+      .getElementById('otpBox')
+      .classList.remove('visible');
+
+    document.getElementById('btnSendOtp').textContent =
+      'Send OTP';
+
+    document.getElementById('btnSendOtp').className = '';
+
+    clearInterval(timerInterval);
+  }
+
+  const v = this.value
+    .replace(/\D/g, '')
+    .slice(0, 10);
+
+  this.value = v;
+
+  const valid = /^[6-9]\d{9}$/.test(v);
+
+  if (!v) {
+
+    setHint(
+      'hint-mobile',
+      'mobile',
+      'info',
+      'Indian number starting with 6, 7, 8, or 9'
+    );
+
+  } else if (v.length < 10) {
+
+    setHint(
+      'hint-mobile',
+      'mobile',
+      'err',
+      `${10 - v.length} more digit(s) needed`
+    );
+
+  } else if (!valid) {
+
+    setHint(
+      'hint-mobile',
+      'mobile',
+      'err',
+      'Must start with 6, 7, 8, or 9'
+    );
+
+  } else {
+
+    setHint(
+      'hint-mobile',
+      'mobile',
+      'ok',
+      'Valid mobile — click Send OTP'
+    );
+  }
+
+  document.getElementById('btnSendOtp').disabled =
+    !valid || mobileVerified;
+
+  updateRegisterBtn();
+});
+
+
+/* SEND OTP */
+
+document.getElementById('btnSendOtp').addEventListener(
+  'click',
+  async () => {
+
+    const mobile =
+      document.getElementById('mobile').value.trim();
+
+    const btn =
+      document.getElementById('btnSendOtp');
+
+    const otpBox =
+      document.getElementById('otpBox');
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+
+    try {
+
+      const res = await fetch(
+        `${BACKEND}/send-otp`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ mobile })
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+
+        const otpCode =
+          data.testOtp ||
+          data.otp ||
+          'N/A';
+
+        alert(
+          `Your OTP is: ${otpCode}\n\nDo not share this with anyone.`
+        );
+
+        console.log(
+          `[OTP] Your code is: ${otpCode}`
+        );
+
+        showToast(
+          `OTP sent to ${mobile.slice(0,2)}XXXXXXXX`,
+          'success'
+        );
+
+        otpBox.classList.add('visible');
+
+        document
+          .getElementById('otp0')
+          .focus();
+
+        startCountdown(60);
+
+        btn.textContent =
+          'Resend in 60s';
+
+      } else {
+
+        showToast(
+          data.message || 'Failed to send OTP',
+          'error'
+        );
+
+        btn.disabled = false;
+        btn.textContent = 'Send OTP';
+      }
+
+    } catch (e) {
+
+      console.error(e);
+
+      showToast(
+        'Network error. Please try again.',
+        'error'
+      );
+
+      btn.disabled = false;
+      btn.textContent = 'Send OTP';
+    }
+  }
+);
+
+
+/* OTP INPUT */
+
+document
+  .querySelectorAll('.otp-digit')
+  .forEach((inp, idx, arr) => {
+
+    inp.addEventListener('input', function() {
+
+      this.value =
+        this.value
+          .replace(/\D/g, '')
+          .slice(-1);
+
+      if (
+        this.value &&
+        idx < arr.length - 1
+      ) {
+        arr[idx + 1].focus();
+      }
+
+      if (getOtp().length === 6) {
+        verifyOtp();
+      }
+    });
+
+
+    inp.addEventListener('keydown', function(e) {
+
+      if (
+        e.key === 'Backspace' &&
+        !this.value &&
+        idx > 0
+      ) {
+        arr[idx - 1].focus();
+      }
+    });
+
+
+    inp.addEventListener('paste', function(e) {
+
+      e.preventDefault();
+
+      const pasted =
+        e.clipboardData
+          .getData('text')
+          .replace(/\D/g, '')
+          .slice(0, 6);
+
+      arr.forEach((box, i) => {
+
+        box.value =
+          pasted[i] || '';
+      });
+
+      if (pasted.length === 6) {
+        verifyOtp();
+      }
+    });
+
+  });
+
+
+function getOtp() {
+
+  return Array
+    .from(
+      document.querySelectorAll('.otp-digit')
+    )
+    .map(i => i.value)
+    .join('');
+}
+
+
+/* VERIFY OTP */
+
+async function verifyOtp() {
+
+  const otp = getOtp();
+
+  const mobile =
+    document.getElementById('mobile')
+      .value.trim();
+
+  try {
+
+    const res = await fetch(
+      `${BACKEND}/verify-otp`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          mobile,
+          otp
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+
+      mobileVerified = true;
+
+      clearInterval(timerInterval);
+
+      document
+        .getElementById('otpBox')
+        .classList.remove('visible');
+
+      document
+        .getElementById('verifiedBadge')
+        .classList.add('visible');
+
+      const btn =
+        document.getElementById('btnSendOtp');
+
+      btn.textContent = 'Verified';
+      btn.className = 'verified';
+      btn.disabled = true;
+
+      setHint(
+        'hint-mobile',
+        'mobile',
+        'ok',
+        'Mobile number verified'
+      );
+
+      showToast(
+        'Mobile number verified',
+        'success'
+      );
+
+      updateRegisterBtn();
+
+    } else {
+
+      showToast(
+        data.message || 'Incorrect OTP',
+        'error'
+      );
+
+      document
+        .querySelectorAll('.otp-digit')
+        .forEach(i => {
+
+          i.value = '';
+          i.classList.add('invalid');
+        });
+
+      document
+        .getElementById('otp0')
+        .focus();
+
+      setTimeout(() => {
+
+        document
+          .querySelectorAll('.otp-digit')
+          .forEach(i =>
+            i.classList.remove('invalid')
+          );
+
+      }, 1200);
+    }
+
+  } catch (e) {
+
+    console.error(e);
+
+    showToast(
+      'Could not verify OTP.',
+      'error'
+    );
+  }
+}
+
+
+/* OTP COUNTDOWN */
+
+function startCountdown(secs) {
+
+  let remaining = secs;
+
+  clearInterval(timerInterval);
+
+  const btn =
+    document.getElementById('btnSendOtp');
+
+  timerInterval =
+    setInterval(() => {
+
+      remaining--;
+
+      btn.textContent =
+        `Resend in ${remaining}s`;
+
+      if (remaining <= 0) {
+
+        clearInterval(timerInterval);
+
+        btn.textContent =
+          'Resend OTP';
+
+        btn.disabled = false;
+
+        document.getElementById(
+          'countdown'
+        ).innerHTML =
+          `Didn't receive it?
+           <a onclick="document.getElementById('btnSendOtp').click()">
+           Resend OTP</a>`;
+
+      } else {
+
+        document.getElementById(
+          'countdown'
+        ).textContent =
+          `OTP expires in ${remaining}s`;
+      }
+
+    }, 1000);
+}
+
+
+/* =========================================================
+   REGISTRATION BUTTON
+========================================================= */
+
+function updateRegisterBtn() {
+
+  const nameOk =
+    document
+      .getElementById('name')
+      .classList
+      .contains('valid');
+
+  const emailOk =
+    document
+      .getElementById('email')
+      .classList
+      .contains('valid');
+
+  const pwOk =
+    document
+      .getElementById('password')
+      .classList
+      .contains('valid');
+
+  const aadOk =
+    document
+      .getElementById('aadhaar')
+      .classList
+      .contains('valid');
+
+  const dobOk =
+    document
+      .getElementById('dob')
+      .classList
+      .contains('valid');
+
+  const mobOk =
+    mobileVerified;
+
+  document.getElementById(
+    'registerBtn'
+  ).disabled =
+    !(
+      nameOk &&
+      emailOk &&
+      pwOk &&
+      aadOk &&
+      dobOk &&
+      mobOk
+    );
+}
+
+
+/* =========================================================
+   FACE DETECTION
+========================================================= */
+
+let faceImage = "";
+let faceDescriptor = null;
+
+let liveDetection = false;
+let blinkDetected = false;
+
+let eyeWasClosed = false;
+
+let detectionRunning = false;
+let livenessLoopRunning = false;
+
+let modelsLoaded = false;
+let cameraReady = false;
+
+
+/*
+  Faster SSD MobileNet settings.
+
+  320 is much faster than the default
+  while still being suitable for a
+  close webcam face.
+*/
+
+const detectorOptions =
+  new faceapi.SsdMobilenetv1Options({
+    minConfidence: 0.5,
+    inputSize: 320
+  });
+
+
+/*
+  Blink thresholds.
+
+  A blink is detected when the eye
+  first becomes closed and then opens.
+*/
+
+const EYE_CLOSED_THRESHOLD = 0.27;
+const EYE_OPEN_THRESHOLD = 0.30;
+
+
+/* =========================================================
+   EYE ASPECT RATIO
+========================================================= */
+
+function getEAR(eye) {
+
+  const dist = (a, b) =>
+    Math.hypot(
+      a.x - b.x,
+      a.y - b.y
+    );
+
+  const A =
+    dist(eye[1], eye[5]);
+
+  const B =
+    dist(eye[2], eye[4]);
+
+  const C =
+    dist(eye[0], eye[3]);
+
+  if (C === 0) {
+    return 0;
+  }
+
+  return (A + B) / (2 * C);
+}
+
+
+/* =========================================================
+   LOAD FACE MODELS
+========================================================= */
+
+async function loadModels() {
+
+  try {
+
+    const status =
+      document.getElementById('statusMsg');
+
+    status.textContent =
+      'Loading face detection models…';
+
+
+    /*
+      Load all three existing models
+      at the same time.
+    */
+
+    await Promise.all([
+
+      faceapi.nets.ssdMobilenetv1
+        .loadFromUri(MODEL_URL),
+
+      faceapi.nets.faceLandmark68Net
+        .loadFromUri(MODEL_URL),
+
+      faceapi.nets.faceRecognitionNet
+        .loadFromUri(MODEL_URL)
+
+    ]);
+
+
+    modelsLoaded = true;
+
+    status.textContent =
+      'Models loaded — look at the camera and blink once';
+
+
+  } catch (err) {
+
+    console.error(
+      'Model loading error:',
+      err
+    );
+
+    document.getElementById(
+      'statusMsg'
+    ).textContent =
+      'Failed to load models: ' +
+      err.message;
+  }
+}
+
+
+/* =========================================================
+   START CAMERA
+========================================================= */
+
+async function startCamera() {
+
+  try {
+
+    const video =
+      document.getElementById('video');
+
+
+    /*
+      Lower resolution means less
+      processing for SSD MobileNet.
+    */
+
+    const stream =
+      await navigator.mediaDevices
+        .getUserMedia({
+
+          video: {
+
+            width: {
+              ideal: 640
+            },
+
+            height: {
+              ideal: 480
+            },
+
+            facingMode: 'user'
+          },
+
+          audio: false
+        });
+
+
+    video.srcObject = stream;
+
+    await video.play();
+
+    cameraReady = true;
+
+
+  } catch (err) {
+
+    console.error(
+      'Camera error:',
+      err
+    );
+
+    document.getElementById(
+      'statusMsg'
+    ).textContent =
+      'Camera Error: ' +
+      err.message;
+  }
+}
+
+
+/* =========================================================
+   LIVENESS DETECTION LOOP
+========================================================= */
+
+function startLivenessLoop() {
+
+  if (livenessLoopRunning) {
+    return;
+  }
+
+  if (!modelsLoaded || !cameraReady) {
+    return;
+  }
+
+  livenessLoopRunning = true;
+
+  const video =
+    document.getElementById('video');
+
+
+  async function detectFrame() {
+
+    /*
+      Do not allow two face detections
+      to execute simultaneously.
+    */
+
+    if (detectionRunning) {
+
+      setTimeout(
+        detectFrame,
+        150
+      );
+
+      return;
+    }
+
+    detectionRunning = true;
+
+
+    try {
+
+      if (
+        video.readyState < 2 ||
+        video.videoWidth === 0 ||
+        video.videoHeight === 0
+      ) {
+
+        return;
+      }
+
+
+      /*
+        SSD MobileNet detection
+        + facial landmarks.
+      */
+
+      const detection =
+        await faceapi
+          .detectSingleFace(
+            video,
+            detectorOptions
+          )
+          .withFaceLandmarks();
+
+
+      const blinkBox =
+        document.getElementById(
+          'blinkBox'
+        );
+
+      const captureBtn =
+        document.getElementById(
+          'captureBtn'
+        );
+
+
+      /*
+        No face found.
+      */
+
+      if (!detection) {
+
+        if (!blinkDetected) {
+
+          blinkBox.textContent =
+            'No face detected. Position your face in frame.';
+
+          blinkBox.className = '';
+
+          captureBtn.disabled = true;
+        }
+
+        return;
+      }
+
+
+      /*
+        Face found.
+      */
+
+      if (!blinkDetected) {
+
+        blinkBox.textContent =
+          'Face detected. Blink once naturally.';
+
+        blinkBox.className = '';
+      }
+
+
+      const landmarks =
+        detection.landmarks;
+
+
+      const leftEye =
+        landmarks.getLeftEye();
+
+      const rightEye =
+        landmarks.getRightEye();
+
+
+      const leftEAR =
+        getEAR(leftEye);
+
+      const rightEAR =
+        getEAR(rightEye);
+
+
+      const averageEAR =
+        (leftEAR + rightEAR) / 2;
+
+
+      /*
+        Detect closed eye.
+      */
+
+      if (
+        !blinkDetected &&
+        averageEAR <
+        EYE_CLOSED_THRESHOLD
+      ) {
+
+        eyeWasClosed = true;
+      }
+
+
+      /*
+        Detect eye opening after closing.
+        This completes the blink.
+      */
+
+      if (
+        !blinkDetected &&
+        eyeWasClosed &&
+        averageEAR >
+        EYE_OPEN_THRESHOLD
+      ) {
+
+        blinkDetected = true;
+        liveDetection = true;
+        eyeWasClosed = false;
+
+
+        blinkBox.textContent =
+          'Blink detected — ready to capture';
+
+        blinkBox.className =
+          'blink-ok';
+
+        captureBtn.disabled = false;
+
+
+        document.getElementById(
+          'faceStatus'
+        ).textContent =
+          'Liveness verified. Click Capture face.';
+      }
+
+
+    } catch (err) {
+
+      console.error(
+        'Face detection error:',
+        err
+      );
+
+    } finally {
+
+      detectionRunning = false;
+
+      /*
+        Wait 150ms before the next
+        detection instead of using
+        overlapping setInterval calls.
+      */
+
+      setTimeout(
+        detectFrame,
+        150
+      );
+    }
+  }
+
+
+  detectFrame();
+}
+
+
+/* =========================================================
+   CAPTURE FACE
+========================================================= */
+
+async function captureFace() {
+
+  const faceStatus =
+    document.getElementById(
+      'faceStatus'
+    );
+
+  const captureBtn =
+    document.getElementById(
+      'captureBtn'
+    );
+
+  const video =
+    document.getElementById(
+      'video'
+    );
+
+  const canvas =
+    document.getElementById(
+      'canvas'
+    );
+
+
+  if (!liveDetection) {
+
+    faceStatus.style.color =
+      '#9c2b2b';
+
+    faceStatus.textContent =
+      'Please blink once before capturing your face.';
+
+    return;
+  }
+
+
+  captureBtn.disabled = true;
+
+  faceStatus.style.color =
+    '#5a5a52';
+
+  faceStatus.textContent =
+    'Capturing face…';
+
+
+  try {
+
+    /*
+      Capture the current camera frame.
+    */
+
+    canvas.width =
+      video.videoWidth;
+
+    canvas.height =
+      video.videoHeight;
+
+
+    const context =
+      canvas.getContext('2d');
+
+    context.drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+    /*
+      Detect face again on the captured
+      frame and generate descriptor.
+    */
+
+    const detection =
+      await faceapi
+        .detectSingleFace(
+          canvas,
+          detectorOptions
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+
+    if (!detection) {
+
+      faceStatus.style.color =
+        '#9c2b2b';
+
+      faceStatus.textContent =
+        'Face not detected. Please look directly at the camera and try again.';
+
+      captureBtn.disabled = false;
+
+      return;
+    }
+
+
+    /*
+      JPEG is smaller than PNG,
+      reducing registration payload size.
+    */
+
+    faceImage =
+      canvas.toDataURL(
+        'image/jpeg',
+        0.85
+      );
+
+
+    /*
+      Store the 128-dimensional
+      face descriptor.
+    */
+
+    faceDescriptor =
+      Array.from(
+        detection.descriptor
+      );
+
+
+    faceStatus.style.color =
+      '#1f6f43';
+
+    faceStatus.textContent =
+      'Live face captured successfully ✓';
+
+    captureBtn.textContent =
+      'Face captured ✓';
+
+
+  } catch (err) {
+
+    console.error(
+      'Face capture error:',
+      err
+    );
+
+    faceStatus.style.color =
+      '#9c2b2b';
+
+    faceStatus.textContent =
+      'Face capture failed. Please try again.';
+
+    captureBtn.disabled = false;
+  }
+}
+
+
+/* =========================================================
+   INITIALIZE FACE SYSTEM
+========================================================= */
+
+async function initializeFaceSystem() {
+
+  /*
+    Camera and models load in parallel.
+  */
+
+  await Promise.all([
+    startCamera(),
+    loadModels()
+  ]);
+
+
+  /*
+    Start liveness only after BOTH
+    camera and models are ready.
+  */
+
+  if (
+    modelsLoaded &&
+    cameraReady
+  ) {
+
+    document.getElementById(
+      'statusMsg'
+    ).textContent =
+      'Models loaded — look at the camera and blink once';
+
+    startLivenessLoop();
+  }
+}
+
+
+/* =========================================================
+   REGISTRATION SUBMISSION
+========================================================= */
+
+document
+  .getElementById('registerForm')
+  .addEventListener(
+    'submit',
+    async (e) => {
+
+      e.preventDefault();
+
+
+      if (!mobileVerified) {
+
+        showToast(
+          'Please verify your mobile number with OTP first.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      if (!faceDescriptor) {
+
+        alert(
+          'Please complete the liveness check and capture your face first.'
+        );
+
+        return;
+      }
+
+
+      if (!liveDetection) {
+
+        alert(
+          'Liveness verification failed. Please blink and try again.'
+        );
+
+        return;
+      }
+
+
+      const name =
+        document
+          .getElementById('name')
+          .value
+          .trim();
+
+      const email =
+        document
+          .getElementById('email')
+          .value
+          .trim();
+
+      const password =
+        document
+          .getElementById('password')
+          .value;
+
+      const aadhaar =
+        document
+          .getElementById('aadhaar')
+          .value
+          .replace(/\s/g, '');
+
+      const dob =
+        document
+          .getElementById('dob')
+          .value;
+
+      const mobile =
+        document
+          .getElementById('mobile')
+          .value;
+
+
+      const registerBtn =
+        document.getElementById(
+          'registerBtn'
+        );
+
+      registerBtn.disabled = true;
+
+      registerBtn.textContent =
+        'Submitting…';
+
+
+      try {
+
+        const response =
+          await fetch(
+            `${BACKEND}/register`,
+            {
+              method: 'POST',
+
+              headers: {
+                'Content-Type':
+                  'application/json'
+              },
+
+              body: JSON.stringify({
+
+                name,
+                email,
+                password,
+                aadhaar,
+                dob,
+                mobile,
+
+                face_image:
+                  faceImage,
+
+                faceDescriptor:
+                  faceDescriptor
+              })
+            }
+          );
+
+
+        const data =
+          await response.json();
+
+
+        alert(
+          data.message
+        );
+
+
+        if (data.success) {
+
+          window.location.href =
+            'login.html';
+        }
+
+
+      } catch (error) {
+
+        console.error(
+          'Registration error:',
+          error
+        );
+
+        alert(
+          'Registration failed: ' +
+          error.message
+        );
+
+
+      } finally {
+
+        registerBtn.disabled = false;
+
+        registerBtn.textContent =
+          'Submit registration';
+      }
+    }
+  );
+
+
+/* =========================================================
+   START EVERYTHING
+========================================================= */
+
+initializeFaceSystem();
+
+</script>
+
+</body>
+</html>
+

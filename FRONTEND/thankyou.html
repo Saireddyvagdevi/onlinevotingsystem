@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteStream — Vote Recorded</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --navy-950: #0b1d33; --navy-900: #102b4a; --navy-700: #1d4570;
+  --maroon: #8a1538; --saffron: #c9742a;
+  --paper: #f6f3ec; --paper-card: #ffffff;
+  --ink: #1a1a1a; --ink-soft: #5a5a52; --line: #d8d2c2;
+  --ok: #1f6f43; --ok-bg: #eaf3ec;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+body{ font-family:'Inter', sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; display:flex; flex-direction:column; }
+
+.gov-bar{ background:var(--navy-950); color:#e8e4d8; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.08em; padding:7px 0; text-align:center; border-bottom:3px solid var(--saffron); }
+header.site-header{ background:var(--navy-900); color:#fff; padding:22px 5%; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(255,255,255,0.08); }
+.emblem{ width:46px; height:46px; border-radius:50%; border:2px solid var(--saffron); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.emblem svg{ width:26px; height:26px; }
+.brand-text h1{ font-family:'Source Serif 4', serif; font-weight:600; font-size:22px; }
+.brand-text p{ font-size:11.5px; color:#a9b8cc; letter-spacing:0.04em; margin-top:2px; }
+
+main{ flex:1; display:flex; align-items:center; justify-content:center; padding:48px 20px; }
+.shell{ width:100%; max-width:460px; text-align:center; }
+
+.check-mark{
+  width:64px; height:64px;
+  border-radius:50%;
+  background:var(--ok-bg);
+  border:1.5px solid #a8d3b4;
+  display:flex; align-items:center; justify-content:center;
+  margin:0 auto 24px;
+}
+.check-mark svg{ width:30px; height:30px; }
+
+.card{ background:var(--paper-card); border:1px solid var(--line); border-top:4px solid var(--ok); padding:40px 36px; box-shadow:0 1px 2px rgba(11,29,51,0.04), 0 12px 28px -16px rgba(11,29,51,0.18); }
+
+.card h2{ font-family:'Source Serif 4', serif; font-size:27px; font-weight:600; margin-bottom:10px; color:var(--navy-950); }
+.card p{ font-size:14px; color:var(--ink-soft); line-height:1.6; margin-bottom:8px; }
+
+.ref-line{
+  font-family:'JetBrains Mono', monospace;
+  font-size:11.5px;
+  color:var(--ink-soft);
+  margin-top:20px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+}
+
+a.home-link{
+  display:inline-block;
+  margin-top:26px;
+  padding:12px 28px;
+  background:var(--navy-950);
+  color:#fff;
+  text-decoration:none;
+  font-size:13.5px;
+  font-weight:600;
+  letter-spacing:0.02em;
+  transition:background 0.15s ease;
+}
+a.home-link:hover{ background:var(--navy-700); }
+
+footer{ text-align:center; font-size:11px; color:var(--ink-soft); padding:20px; font-family:'JetBrains Mono', monospace; letter-spacing:0.03em; }
+</style>
+</head>
+<body>
+
+<div class="gov-bar">SECURE ELECTORAL PORTAL · SESSION ENCRYPTED · BUILD 2026.06</div>
+
+<header class="site-header">
+  <div class="emblem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c9742a" stroke-width="1.4">
+      <circle cx="12" cy="12" r="9.4"/><circle cx="12" cy="12" r="1.6" fill="#c9742a" stroke="none"/>
+      <g stroke="#c9742a" stroke-width="0.9">
+        <line x1="12" y1="2.6" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21.4"/>
+        <line x1="2.6" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21.4" y2="12"/>
+        <line x1="5.2" y1="5.2" x2="7.5" y2="7.5"/><line x1="16.5" y1="16.5" x2="18.8" y2="18.8"/>
+        <line x1="18.8" y1="5.2" x2="16.5" y2="7.5"/><line x1="7.5" y1="16.5" x2="5.2" y2="18.8"/>
+      </g>
+    </svg>
+  </div>
+  <div class="brand-text"><h1>VoteStream</h1><p>National Digital Voting Authority</p></div>
+</header>
+
+<main>
+  <div class="shell">
+    <div class="card">
+      <div class="check-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#1f6f43" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2>Your vote has been recorded</h2>
+      <p>Thank you for participating. Your ballot has been securely cast and cannot be altered or duplicated.</p>
+
+      <div class="ref-line">VOTE CONFIRMED · ONE SUBMISSION PER VOTER</div>
+
+      <a href="login.html" class="home-link">Return to portal</a>
+    </div>
+  </div>
+</main>
+
+<footer>VOTESTREAM · A SECURE NATIONAL ELECTORAL SYSTEM · NOT AFFILIATED WITH ANY GOVERNMENT BODY</footer>
+
+</body>
+</html>

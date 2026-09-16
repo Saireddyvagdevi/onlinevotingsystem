@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteStream — Cast Your Vote</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --navy-950: #0b1d33; --navy-900: #102b4a; --navy-700: #1d4570;
+  --maroon: #8a1538; --saffron: #c9742a;
+  --paper: #f6f3ec; --paper-card: #ffffff;
+  --ink: #1a1a1a; --ink-soft: #5a5a52; --line: #d8d2c2;
+}
+*{ margin:0; padding:0; box-sizing:border-box; }
+body{ font-family:'Inter', sans-serif; background:var(--paper); color:var(--ink); min-height:100vh; }
+
+.gov-bar{ background:var(--navy-950); color:#e8e4d8; font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.08em; padding:7px 0; text-align:center; border-bottom:3px solid var(--saffron); }
+header.site-header{ background:var(--navy-900); color:#fff; padding:22px 5%; display:flex; align-items:center; gap:16px; border-bottom:1px solid rgba(255,255,255,0.08); }
+.emblem{ width:46px; height:46px; border-radius:50%; border:2px solid var(--saffron); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.emblem svg{ width:26px; height:26px; }
+.brand-text h1{ font-family:'Source Serif 4', serif; font-weight:600; font-size:22px; }
+.brand-text p{ font-size:11.5px; color:#a9b8cc; letter-spacing:0.04em; margin-top:2px; }
+
+main{ max-width:980px; margin:0 auto; padding:48px 24px 70px; }
+
+.page-eyebrow{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.page-eyebrow .rule{ flex:1; height:1px; background:var(--line); }
+.page-eyebrow span{ font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.12em; color:var(--ink-soft); text-transform:uppercase; }
+
+h1.page-title{ font-family:'Source Serif 4', serif; font-size:32px; font-weight:600; color:var(--navy-950); margin-bottom:8px; }
+p.page-sub{ font-size:14px; color:var(--ink-soft); margin-bottom:36px; max-width:560px; line-height:1.5; }
+
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:20px;
+}
+
+.party-card{
+    background:var(--paper-card);
+    border:1px solid var(--line);
+    border-top:3px solid transparent;
+    padding:28px 24px;
+    text-align:center;
+    transition:border-color 0.2s ease, transform 0.15s ease;
+}
+
+.party-card:hover{
+    border-top-color:var(--maroon);
+    transform:translateY(-3px);
+}
+
+.party-card img{
+    width:84px;
+    height:84px;
+    object-fit:cover;
+    border-radius:50%;
+    margin-bottom:16px;
+    border:1px solid var(--line);
+}
+
+.party-card h2{
+    font-family:'Source Serif 4', serif;
+    margin-bottom:18px;
+    color:var(--navy-950);
+    font-size:18px;
+    font-weight:600;
+}
+
+.vote-btn{
+    width:100%;
+    padding:11px 20px;
+    border:none;
+    background:var(--navy-950);
+    color:white;
+    font-size:13.5px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    transition:background 0.15s ease;
+}
+
+.vote-btn:hover{ background:var(--navy-700); }
+
+footer{ text-align:center; font-size:11px; color:var(--ink-soft); padding:20px; font-family:'JetBrains Mono', monospace; letter-spacing:0.03em; }
+</style>
+
+</head>
+<body>
+
+<div class="gov-bar">SECURE ELECTORAL PORTAL · SESSION ENCRYPTED · BUILD 2026.06</div>
+
+<header class="site-header">
+  <div class="emblem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#c9742a" stroke-width="1.4">
+      <circle cx="12" cy="12" r="9.4"/><circle cx="12" cy="12" r="1.6" fill="#c9742a" stroke="none"/>
+      <g stroke="#c9742a" stroke-width="0.9">
+        <line x1="12" y1="2.6" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="21.4"/>
+        <line x1="2.6" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="21.4" y2="12"/>
+        <line x1="5.2" y1="5.2" x2="7.5" y2="7.5"/><line x1="16.5" y1="16.5" x2="18.8" y2="18.8"/>
+        <line x1="18.8" y1="5.2" x2="16.5" y2="7.5"/><line x1="7.5" y1="16.5" x2="5.2" y2="18.8"/>
+      </g>
+    </svg>
+  </div>
+  <div class="brand-text"><h1>VoteStream</h1><p>National Digital Voting Authority</p></div>
+</header>
+
+<main>
+
+  <div class="page-eyebrow"><span>Official Ballot</span><div class="rule"></div></div>
+  <h1 class="page-title">Cast your vote</h1>
+  <p class="page-sub">Select one party below. Your identity has been verified — this vote will be recorded once and cannot be changed.</p>
+
+  <div class="container">
+
+      <div class="party-card">
+          <img src="https://i.pinimg.com/736x/de/22/b3/de22b32d80dc1c7f2b5e46e94dd9c39b.jpg">
+          <h2>BJP</h2>
+          <button class="vote-btn" onclick="vote('BJP')">Vote</button>
+      </div>
+
+      <div class="party-card">
+          <img src="https://p7.hiclipart.com/preview/863/217/159/telugu-desam-party-andhra-pradesh-political-party-bharatiya-janata-party-others.jpg ">
+          <h2>TDP</h2>
+          <button class="vote-btn" onclick="vote('TDP')">Vote</button>
+      </div>
+
+      <div class="party-card">
+          <img src="https://www.nicepng.com/png/full/593-5935794_open-ysr-congress-party-symbol.png">
+          <h2>YSRCP</h2>
+          <button class="vote-btn" onclick="vote('YSRCP')">Vote</button>
+      </div>
+
+      <div class="party-card">
+          <img src="https://toppng.com/uploads/preview/what-was-the-election-commission-notification-symbol-of-nota-in-electio-11563201125bajeaxyypx.png">
+          <h2>NOTA</h2>
+          <button class="vote-btn" onclick="vote('NOTA')">Vote</button>
+      </div>
+
+  </div>
+
+</main>
+
+<footer>VOTESTREAM · A SECURE NATIONAL ELECTORAL SYSTEM · NOT AFFILIATED WITH ANY GOVERNMENT BODY</footer>
+
+<script src="config.js"></script>
+<script>
+async function vote(partyName){
+
+    const confirmVote = confirm(
+        "Are you sure you want to vote for " + partyName + " ?"
+    );
+
+    if(!confirmVote){
+        return;
+    }
+
+    const userId = localStorage.getItem("user_id");
+
+    if(!userId){
+        alert("You are not logged in. Please login first.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try{
+
+        const response = await fetch(`${API_BASE_URL}/vote`, {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                userId: userId,
+                party: partyName
+            })
+        });
+
+        const data = await response.json();
+
+        alert(data.message);
+
+        if(data.success === true){
+            window.location.href = "thankyou.html";
+        }
+
+    }catch(error){
+        console.log(error);
+        alert("Voting failed. Please check that the server is running.");
+    }
+}
+</script>
+
+</body>
+</html>

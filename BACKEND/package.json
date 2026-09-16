@@ -1,0 +1,18 @@
+{
+  "name": "online-voting-system",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@vladmandic/face-api": "^1.7.15",
+    "axios": "^1.7.7",
+    "canvas": "^3.2.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
+    "face-api.js": "^0.22.2",
+    "pg": "^8.22.0"
+  }
+}
